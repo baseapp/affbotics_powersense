@@ -123,11 +123,6 @@ double ATM90E26_SPI::GetActivePower(){
 	return (double)apower;
 }
 
-double ATM90E26_SPI::GetReactivePower(){
-  short int rpower= (short int)CommEnergyIC(1,Qmean,0xFFFF); //Complement, MSB is signed bit
-  return (double)rpower;
-}
-
 double ATM90E26_SPI::GetFrequency(){
 	unsigned short freq=CommEnergyIC(1,Freq,0xFFFF);
 	return (double)freq/100;

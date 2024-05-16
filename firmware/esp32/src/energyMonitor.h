@@ -17,7 +17,6 @@ class EnergyMonitor{
     float voltage;
     float current;
     float activePower;
-    float reactivePower;
     float frequency;
     float powerFactor;
     float importEnergy;

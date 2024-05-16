@@ -44,7 +44,6 @@ void EnergyMonitor::fetchEnergyData() {
   float voltage = 0;
   float current = 0;
   float activePower = 0;
-  float reactivePower = 0;
   float frequency = 0;
   float powerFactor = 0;
   float importEnergyTemp = 0;
@@ -72,8 +71,6 @@ void EnergyMonitor::fetchEnergyData() {
     yield();
     activePower = _eic.GetActivePower() * 3;
     yield();
-    reactivePower = _eic.GetReactivePower() * 3;
-    yield();
     powerFactor = _eic.GetPowerFactor();
     yield();
     importEnergyTemp = _eic.GetImportEnergy();
@@ -90,8 +87,6 @@ void EnergyMonitor::fetchEnergyData() {
   Serial.println(current);
   Serial.print("Active Power: ");
   Serial.println(activePower);
-  Serial.print("Reactive Power: ");
-  Serial.println(reactivePower);
   Serial.print("Frequency: ");
   Serial.println(frequency);
   Serial.print("Power Factor: ");
@@ -104,14 +99,13 @@ void EnergyMonitor::fetchEnergyData() {
 
   StaticJsonDocument<JSON_OBJECT_SIZE(7) + 140> jsonBuffer;
   // Fill in the JSON object with data
-  jsonBuffer["v"] = voltage;
-  jsonBuffer["i"] = current;
-  jsonBuffer["pa"] = activePower;
-  jsonBuffer["pr"] = reactivePower;
-  jsonBuffer["fr"] = frequency;
-  jsonBuffer["pf"] = powerFactor;
-  jsonBuffer["ie"] = importEnergy;
-  jsonBuffer["ee"] = exportEnergy;
+  jsonBuffer["voltage"] = voltage;
+  jsonBuffer["current"] = current;
+  jsonBuffer["power"] = activePower;
+  jsonBuffer["frequency"] = frequency;
+  jsonBuffer["powerFactor"] = powerFactor;
+  jsonBuffer["importEnergy"] = importEnergy;
+  jsonBuffer["exportEnergy"] = exportEnergy;
 
   // Serialize the JSON object
   energyJsonString = "";
