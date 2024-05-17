@@ -4,12 +4,24 @@
 #include "energyic_SPI.h"
 #include <EnergyMonitorSettingsService.h>
 #include <energyMonitor.h>
+#include <ThingsBoard.h>
+#include <Arduino_MQTT_Client.h>
+
+constexpr char TOKEN[] = "v651bxv7eyzutp5izt1t"; // TODO: Dynamically generate token
+constexpr char THINGSBOARD_SERVER[] = "iot.affbotics.com";
+constexpr int THINGSBOARD_PORT = 1883;
+constexpr uint16_t MAX_MESSAGE_SIZE = 512;
 
 #define SERIAL_BAUD_RATE 115200
 
 ATM90E26_SPI eic;
 AsyncWebServer server(80);
 ESP8266React esp8266React(&server);
+// Initalize the Mqtt client instance
+WiFiClient espClient;
+Arduino_MQTT_Client mqttClient(espClient);
+ThingsBoard tb(mqttClient, MAX_MESSAGE_SIZE);
+
 // LightMqttSettingsService lightMqttSettingsService =
 //     LightMqttSettingsService(&server, esp8266React.getFS(), esp8266React.getSecurityManager());
 // LightStateService lightStateService = LightStateService(&server,
@@ -19,7 +31,7 @@ ESP8266React esp8266React(&server);
 
 EnergyMonitorSettingsService energyMonitorSettingsService =
       EnergyMonitorSettingsService(&server, esp8266React.getFS(), esp8266React.getSecurityManager());
-EnergyMonitor energyMonitor = EnergyMonitor(&server, eic, esp8266React.getMqttClient(), &energyMonitorSettingsService);
+EnergyMonitor energyMonitor = EnergyMonitor(&server, eic, &tb, &energyMonitorSettingsService);
 
 
 // float importEnergy = 0;
@@ -29,6 +41,27 @@ void fetchLoop(void *pvParameters) {
   while (true) {
     energyMonitor.fetchEnergyData();
     delay(5000);
+  }
+}
+
+void thingboardLoop(void *pvParameters) {
+  while (true) {
+    if(WiFi.status() != WL_CONNECTED){
+      Serial.println("WiFi Disconnected");
+      delay(1000);
+      continue;
+    }
+    if(!tb.connected()){
+      if (!tb.connect(THINGSBOARD_SERVER, TOKEN, THINGSBOARD_PORT)) {
+        Serial.println("Failed to connect");
+        delay(1000);
+        continue;
+      }else{
+        Serial.println("Connected to ThingsBoard");
+      }
+    }
+
+    tb.loop();
   }
 }
 
@@ -54,6 +87,14 @@ void setup() {
               1,          /* Priority of the task. */
               NULL        /* Task handle. */
   );        
+  xTaskCreate(
+              thingboardLoop, /* Task function. */
+              "TaskTwo",  /* String with name of task. */
+              10000,      /* Stack size in bytes. */
+              NULL,       /* Parameter passed as input of the task */
+              1,          /* Priority of the task. */
+              NULL        /* Task handle. */
+  );
 }
 
 

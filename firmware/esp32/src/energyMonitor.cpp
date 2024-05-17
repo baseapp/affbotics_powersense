@@ -2,31 +2,18 @@
 
 EnergyMonitor::EnergyMonitor(AsyncWebServer* server,
                              ATM90E26_SPI eic,
-                             AsyncMqttClient* mqttClient,
+                             ThingsBoard* tb,
                              EnergyMonitorSettingsService* energyMonitorSettingsService) :
     _eic(eic),
-    _mqttClient(mqttClient),
+    _tb(tb),
     _energyMonitorSettingsService(energyMonitorSettingsService)
 {
-  _mqttClient->onConnect(std::bind(&EnergyMonitor::registerConfig, this));
   server->on(ENERGY_DATA_ENDPOINT_PATH, HTTP_GET, std::bind(&EnergyMonitor::energyDataEndpoint, this, std::placeholders::_1));
 
 }
 
 
 void EnergyMonitor::registerConfig() {
-  if (!_mqttClient->connected()) {
-    return;
-  }
-  String configTopic;
-
-  _energyMonitorSettingsService->read([&](EnergyMonitorSettings& settings) {
-    mqttPath = settings.uniqueId + "/" + settings.mqttPath;
-    configTopic = settings.uniqueId + "/status";
-
-  });
-
-  _mqttClient->publish(configTopic.c_str(), 0, false, "Hello from Energy Monitor!");
 
 }
 
@@ -112,8 +99,10 @@ void EnergyMonitor::fetchEnergyData() {
   serializeJson(jsonBuffer, energyJsonString);
 
   // Publish the serialized JSON data
-  _mqttClient->publish("v1/devices/me/telemetry", 0, false, energyJsonString.c_str());
-
+  // _mqttClient->publish("v1/devices/me/telemetry", 0, false, energyJsonString.c_str());
+  if(_tb->connected()){
+    _tb->sendTelemetryJson(energyJsonString.c_str());
+  }
 
   // _mqttClient->publish((mqttPath + "/v").c_str(), 0, false, String(voltage).c_str());
   // _mqttClient->publish((mqttPath + "/i").c_str(), 0, false, String(current).c_str());
