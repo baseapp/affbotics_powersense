@@ -68,7 +68,7 @@ void EnergyMonitor::fetchEnergyData() {
     yield();
   }
 
-#ifdef PRINT_ENERGY_DATA
+#if PRINT_ENERGY_DATA
   Serial.print("Voltage: ");
   Serial.println(voltage);
   Serial.print("Current: ");
