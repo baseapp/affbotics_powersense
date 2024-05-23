@@ -10,6 +10,7 @@
 #include <ThingsBoard.h>
 
 #define ENERGY_DATA_ENDPOINT_PATH "/rest/energyMonitor"
+#define PRINT_ENERGY_DATA 0
 
 class EnergyMonitor{
   public:
@@ -29,6 +30,7 @@ class EnergyMonitor{
                   EnergyMonitorSettingsService* energyMonitorSettingsService);
     void begin();
     void fetchEnergyData();
+    void publishEnergyData();
   private:
     ATM90E26_SPI _eic;
     ThingsBoard* _tb;

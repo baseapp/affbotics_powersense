@@ -68,6 +68,7 @@ void EnergyMonitor::fetchEnergyData() {
     yield();
   }
 
+#ifdef PRINT_ENERGY_DATA
   Serial.print("Voltage: ");
   Serial.println(voltage);
   Serial.print("Current: ");
@@ -83,6 +84,7 @@ void EnergyMonitor::fetchEnergyData() {
   Serial.print("Export Energy: ");
   Serial.println(exportEnergy);
   Serial.println(" ");
+#endif
 
   StaticJsonDocument<JSON_OBJECT_SIZE(7) + 140> jsonBuffer;
   // Fill in the JSON object with data
@@ -100,9 +102,6 @@ void EnergyMonitor::fetchEnergyData() {
 
   // Publish the serialized JSON data
   // _mqttClient->publish("v1/devices/me/telemetry", 0, false, energyJsonString.c_str());
-  if(_tb->connected()){
-    _tb->sendTelemetryJson(energyJsonString.c_str());
-  }
 
   // _mqttClient->publish((mqttPath + "/v").c_str(), 0, false, String(voltage).c_str());
   // _mqttClient->publish((mqttPath + "/i").c_str(), 0, false, String(current).c_str());
@@ -112,6 +111,12 @@ void EnergyMonitor::fetchEnergyData() {
   // _mqttClient->publish((mqttPath + "/ie").c_str(), 0, false, String(importEnergy).c_str());
   // _mqttClient->publish((mqttPath + "/ee").c_str(), 0, false, String(exportEnergy).c_str());
 
+}
+
+void EnergyMonitor::publishEnergyData() {
+  if(_tb->connected()){
+    _tb->sendTelemetryJson(energyJsonString.c_str());
+  }
 }
 
 void EnergyMonitor::energyDataEndpoint(AsyncWebServerRequest* request) {
