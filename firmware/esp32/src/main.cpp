@@ -20,6 +20,10 @@ constexpr uint16_t MAX_MESSAGE_SIZE = 512;
 
 #define SERIAL_BAUD_RATE 115200
 
+#define LED_B 26
+#define LED_G 27
+#define LED_R 14
+
 ATM90E26_SPI eic;
 AsyncWebServer server(80);
 ESP8266React esp8266React(&server);
@@ -49,16 +53,28 @@ void thingboardLoop(void *pvParameters) {
   while (true) {
     if(WiFi.status() != WL_CONNECTED){
       // Serial.println("WiFi Disconnected");
-      delay(1000);
+      digitalWrite(LED_R, LOW);
+      digitalWrite(LED_B, LOW);
+      delay(500);
+      digitalWrite(LED_R, HIGH);
+      digitalWrite(LED_B, HIGH);
       continue;
     }
+
     if(!tb.connected()){
       if (!tb.connect(THINGSBOARD_SERVER, TOKEN, THINGSBOARD_PORT)) {
         Serial.println("Failed to connect");
-        delay(1000);
+        digitalWrite(LED_R, LOW);
+        digitalWrite(LED_G, LOW);
+        delay(500);
+        digitalWrite(LED_R, HIGH);
+        digitalWrite(LED_G, HIGH);
         continue;
       }else{
         Serial.println("Connected to ThingsBoard");
+        digitalWrite(LED_G, LOW);
+        delay(500);
+        digitalWrite(LED_G, HIGH);
       }
     }
 
@@ -69,6 +85,13 @@ void thingboardLoop(void *pvParameters) {
 }
 
 void setup() {
+  pinMode(LED_R, OUTPUT);
+  pinMode(LED_G, OUTPUT);
+  pinMode(LED_B, OUTPUT);
+  digitalWrite(LED_R, HIGH);
+  digitalWrite(LED_G, HIGH);
+  digitalWrite(LED_B, HIGH);
+
   // start serial and filesystem
   Serial.begin(SERIAL_BAUD_RATE);
 

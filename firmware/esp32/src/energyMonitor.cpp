@@ -18,10 +18,11 @@ void EnergyMonitor::registerConfig() {
 }
 
 void EnergyMonitor::begin() {
+  _eic.SetLGain(0x2398); //0xE93A
   _eic.SetUGain(26548);
   _eic.SetIGain(50416); // divide by 3
-  _eic.SetCRC1(0x41FB);
-  _eic.SetCRC2(0xA274); //0xB177
+  _eic.SetCRC1(0xF886);
+  _eic.SetCRC2(0xA274); //0xA274
   _eic.InitEnergyIC();
 }
 

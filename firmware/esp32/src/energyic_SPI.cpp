@@ -180,7 +180,7 @@ void ATM90E26_SPI::InitEnergyIC(){
   CommEnergyIC(0,PLconstH,0x0012); //PL Constant MSB //0x00B9
   CommEnergyIC(0,PLconstL,0x4AD8); //PL Constant LSB //0xc1f3
   CommEnergyIC(0,Lgain,_lgain);   //Line calibration gain
-  CommEnergyIC(0,Lphi,0x0000); //Line calibration angle
+  CommEnergyIC(0,Lphi,0x224); //Line calibration angle
   CommEnergyIC(0,PStartTh,0x08BD); //Active Startup Power Threshold
   CommEnergyIC(0,PNolTh,0x0000); //Active No-Load Power Threshold
   CommEnergyIC(0,QStartTh,0x0AEC); //Reactive Startup Power Threshold
