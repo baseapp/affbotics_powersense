@@ -58,6 +58,7 @@ void thingboardLoop(void *pvParameters) {
       delay(500);
       digitalWrite(LED_R, HIGH);
       digitalWrite(LED_B, HIGH);
+      delay(500);
       continue;
     }
 
@@ -69,6 +70,7 @@ void thingboardLoop(void *pvParameters) {
         delay(500);
         digitalWrite(LED_R, HIGH);
         digitalWrite(LED_G, HIGH);
+        delay(500);
         continue;
       }else{
         Serial.println("Connected to ThingsBoard");
